@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
 @RequiredArgsConstructor
-@ConfigurationProperties(prefix = "scoreBoard")
+@ConfigurationProperties(prefix = "scoreboard")
 public class ScoreBoardProperties {
   private String systemUsername;
   private String systemPassword;
