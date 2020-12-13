@@ -7,7 +7,6 @@ import com.branzmor.scoreboard.repository.team.TeamRepository;
 import com.branzmor.scoreboard.utils.MatchUtils;
 import com.branzmor.scoreboard.utils.ScoreUtils;
 import com.branzmor.scoreboard.utils.TeamUtils;
-import cucumber.api.java.cs.A;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;

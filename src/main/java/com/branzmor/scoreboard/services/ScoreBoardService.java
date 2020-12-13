@@ -3,34 +3,72 @@ package com.branzmor.scoreboard.services;
 import com.branzmor.scoreboard.repository.score.ScoreEntity;
 import com.branzmor.scoreboard.repository.match.MatchEntity;
 import com.branzmor.scoreboard.repository.match.MatchRepository;
+import com.branzmor.scoreboard.repository.score.ScoreRepository;
 import com.branzmor.scoreboard.repository.team.TeamEntity;
 import com.branzmor.scoreboard.repository.team.TeamRepository;
+import gherkin.formatter.model.Match;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import javax.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
-@Component
+
+@RequiredArgsConstructor
+@Service
+@Slf4j
 public class ScoreBoardService {
 
-  protected TeamRepository teamRepository;
-  protected MatchRepository matchRepository;
+  private final TeamRepository teamRepository;
+  private final ScoreRepository scoreRepository;
+  private final MatchRepository matchRepository;
 
+  @Transactional
   public void startGame(TeamEntity homeTeam, TeamEntity awayTeam) {
-    //TODO: Creates a new match with those
+    teamRepository.save(homeTeam);
+    teamRepository.save(awayTeam);
 
-    //TODO: Add the match to the scoreboard
+    log.debug("Teams has been inserted in DB: {}", teamRepository.findAll());
+
+    ScoreEntity score = ScoreEntity.builder()
+        .id(homeTeam.getId() + "vs" + awayTeam.getId())
+        .homeTeamGoals(0)
+        .awayTeamGoals(0)
+        .build();
+
+    scoreRepository.save(score);
+    log.debug("Score has been inserted in DB: {}", scoreRepository.findAll());
+
+    MatchEntity match = MatchEntity.builder()
+        .id(score.getId() + LocalDateTime.now())
+        .homeTeam(homeTeam)
+        .awayTeam(awayTeam)
+        .score(score)
+        .active(true)
+        .build();
+
+    matchRepository.save(match);
+    log.debug("Match has been inserted in DB: {}", matchRepository.findAll());
   }
 
-  public void finishGame(TeamEntity homeTeam, TeamEntity awayTeam) {
-    //TODO: Remove match from the scoreboard
+  @Transactional
+  public void finishGame(MatchEntity match) {
+    match.setActive(false);
+    matchRepository.save(match);
   }
 
-  public void updateScore(MatchEntity matchEntity, ScoreEntity socreEntity) {
-    //TODO: Receiving the pair score; home team score and away team score udpdates a game score
+  @Transactional
+  public void updateScore(MatchEntity match, ScoreEntity score) {
+    match.setScore(score);
+    matchRepository.save(match);
   }
 
+  @Transactional
   public List<MatchEntity> getSummary() {
-    //TODO: Get a summaary of games by total score.
+    //TODO: Get a summary of games by total score.
     // Those games with the same total score will be returned ordered by the most recently added to our system
-    return null;
+    return matchRepository.findAll();
   }
 }
