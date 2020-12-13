@@ -4,7 +4,6 @@ import com.branzmor.scoreboard.utils.TeamUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
