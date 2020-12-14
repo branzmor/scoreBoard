@@ -3,6 +3,7 @@ package com.branzmor.scoreboard.repository.match;
 import com.branzmor.scoreboard.repository.AuditableEntity;
 import com.branzmor.scoreboard.repository.score.ScoreEntity;
 import com.branzmor.scoreboard.repository.team.TeamEntity;
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -13,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Data
 @Builder(toBuilder = true)
@@ -37,6 +39,9 @@ public class MatchEntity extends AuditableEntity {
   @ManyToOne
   @JoinColumn(name="score", referencedColumnName = "id")
   private ScoreEntity score;
+
+  @LastModifiedDate
+  private LocalDateTime lastEventTime;
 
   private boolean active;
 }

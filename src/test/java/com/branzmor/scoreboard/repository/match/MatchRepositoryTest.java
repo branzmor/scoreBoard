@@ -52,7 +52,7 @@ public class MatchRepositoryTest {
 
     Optional<MatchEntity> target = sut.findById(match.getId());
     assertTrue("Can't find stored Team", target.isPresent());
-    assertEquals("", match, target.get());
+    assertEquals("Id does not match", match.getId(), target.get().getId());
   }
 
   @Test(expected = JpaObjectRetrievalFailureException.class)

@@ -1,14 +1,13 @@
 package com.branzmor.scoreboard.services;
 
-import com.branzmor.scoreboard.repository.score.ScoreEntity;
 import com.branzmor.scoreboard.repository.match.MatchEntity;
 import com.branzmor.scoreboard.repository.match.MatchRepository;
+import com.branzmor.scoreboard.repository.score.ScoreEntity;
 import com.branzmor.scoreboard.repository.score.ScoreRepository;
 import com.branzmor.scoreboard.repository.team.TeamEntity;
 import com.branzmor.scoreboard.repository.team.TeamRepository;
-import gherkin.formatter.model.Match;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +45,7 @@ public class ScoreBoardService {
         .homeTeam(homeTeam)
         .awayTeam(awayTeam)
         .score(score)
+        .lastEventTime(LocalDateTime.now())
         .active(true)
         .build();
 
@@ -61,14 +61,41 @@ public class ScoreBoardService {
 
   @Transactional
   public void updateScore(MatchEntity match, ScoreEntity score) {
+    scoreRepository.save(score);
     match.setScore(score);
     matchRepository.save(match);
   }
 
   @Transactional
   public List<MatchEntity> getSummary() {
-    //TODO: Get a summary of games by total score.
-    // Those games with the same total score will be returned ordered by the most recently added to our system
-    return matchRepository.findAll();
+
+    List<MatchEntity> activeMatches = matchRepository.findByActive(true);
+    printScoreBoard("DB", activeMatches);
+    sortMatches(activeMatches);
+    printScoreBoard("Sorted", activeMatches);
+    return activeMatches;
+  }
+
+  private void sortMatches(List<MatchEntity> activeMatches) {
+    activeMatches.sort(new Comparator<MatchEntity>() {
+      public int compare(MatchEntity o1, MatchEntity o2) {
+        return o1.getScore().getTotalGoals() > o2.getScore().getTotalGoals() ? -1 :
+            o1.getScore().getTotalGoals() < o2.getScore().getTotalGoals() ? 1 : doSortByAdded(o1, o2);
+      }
+
+      public int doSortByAdded(MatchEntity o1, MatchEntity o2) {
+        return o1.getLastEventTime().isAfter(o2.getLastEventTime()) ? -1 : o1.getLastEventTime().isBefore(o2.getLastEventTime()) ? 1 : 0;
+
+      }
+    });
+  }
+
+  public void printScoreBoard(String title,List<MatchEntity> activeMatches) {
+    log.debug("---- {} -----", title);
+    activeMatches.forEach(match -> {
+      log.debug("{}-{} {}:{} ({})", match.getHomeTeam().getName(),match.getAwayTeam().getName(),
+          match.getScore().getHomeTeamGoals(),match.getScore().getAwayTeamGoals(),match.getScore().getTotalGoals());
+    });
+    log.debug("---------");
   }
 }

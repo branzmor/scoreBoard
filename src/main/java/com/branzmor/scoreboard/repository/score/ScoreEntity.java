@@ -27,4 +27,6 @@ public class ScoreEntity {
   private int homeTeamGoals;
 
   private int awayTeamGoals;
+
+  public int getTotalGoals() { return homeTeamGoals + awayTeamGoals; }
 }

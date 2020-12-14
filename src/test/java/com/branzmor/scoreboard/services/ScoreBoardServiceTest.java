@@ -10,9 +10,7 @@ import com.branzmor.scoreboard.utils.MatchUtils;
 import com.branzmor.scoreboard.utils.ScoreUtils;
 import com.branzmor.scoreboard.utils.TeamUtils;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.SneakyThrows;
 import org.junit.Test;
@@ -24,9 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -75,7 +70,8 @@ public class ScoreBoardServiceTest {
 
   @Test
   public void updateScore() {
-    sut.updateScore(match,score);
+    sut.updateScore(match, score);
+    verify(scoreRepository).save(any(ScoreEntity.class));
     verify(matchRepository).save(any(MatchEntity.class));
   }
 
@@ -84,7 +80,7 @@ public class ScoreBoardServiceTest {
     MatchEntity match1 = MatchUtils.generateMatch();
     MatchEntity match2 = MatchUtils.generateMatch();
 
-    given(matchRepository.findAll()).willReturn(Arrays.asList(match1,match2));
+    given(matchRepository.findByActive(true)).willReturn(Arrays.asList(match2, match1));
 
     List<MatchEntity> summary = sut.getSummary();
 
