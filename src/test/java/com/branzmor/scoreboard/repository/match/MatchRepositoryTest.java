@@ -9,6 +9,7 @@ import com.branzmor.scoreboard.utils.ScoreUtils;
 import com.branzmor.scoreboard.utils.TeamUtils;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,7 +98,7 @@ public class MatchRepositoryTest {
     sut.saveAndFlush(match);
   }
 
-  @Test
+  @Test(expected = ConstraintViolationException.class)
   public void testIdCantBeEmpty() {
     MatchEntity match = getMatch();
     match.setId(StringUtils.EMPTY);
